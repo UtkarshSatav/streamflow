@@ -30,14 +30,17 @@ export default function HomePage() {
 
     try {
       const res = await fetch("/api/upload", { method: "POST", body: form });
-      if (!res.ok) throw new Error("Upload failed");
       const data = await res.json();
+      if (!res.ok) {
+        setUploadProgress(data.error || "Upload failed.");
+        return;
+      }
       setVideos((prev) => [data.video, ...prev]);
       setUploadProgress("Done!");
       if (fileRef.current) fileRef.current.value = "";
       if (titleRef.current) titleRef.current.value = "";
-    } catch (e) {
-      setUploadProgress("Upload failed. Make sure FFmpeg is installed.");
+    } catch {
+      setUploadProgress("Upload failed. Make sure FFmpeg is installed and you are running locally.");
     } finally {
       setUploading(false);
     }
