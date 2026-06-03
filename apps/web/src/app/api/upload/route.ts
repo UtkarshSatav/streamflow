@@ -6,6 +6,14 @@ import { transcodeVideo } from "@streaming/transcoder";
 const UPLOAD_DIR = join(process.cwd(), "storage", "uploads");
 
 export async function POST(req: NextRequest) {
+  // Vercel has no FFmpeg and read-only filesystem — upload only works locally
+  if (process.env.VERCEL) {
+    return NextResponse.json(
+      { error: "Upload requires FFmpeg and is only available when running locally. Use the pre-loaded demo video instead." },
+      { status: 400 }
+    );
+  }
+
   try {
     const formData = await req.formData();
     const file = formData.get("video") as File | null;
